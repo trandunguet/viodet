@@ -8,3 +8,4 @@ from video_process import VideoProcess
 if __name__ == '__main__':
     video = VideoProcess("assets/test.avi")
     video.process_next_sequence()
+    print(video.vif)
