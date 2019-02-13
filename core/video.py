@@ -25,10 +25,9 @@ class Video:
         frames = []
 
         for _ in range(self.sequence_length):
-            _, frame = self.cap.read()
+            ready, frame = self.cap.read()
+            if not ready:
+                raise Exception("VIDEO ENDED")
             frames.append(frame)
-
-        if len(frames) != self.sequence_length:
-            raise Exception("VIDEO ENDED")
 
         return Sequence(frames, self.farnback_params)
