@@ -22,4 +22,6 @@ class Flows:
             prev_magnitude = magnitude
             
         vif, _ = np.histogram(binary_sum, range(len(self.frames) + 1))
-        return vif
+        mean = np.mean(binary_sum)
+        variance = np.var(binary_sum)
+        return vif, mean, variance
