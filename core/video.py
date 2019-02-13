@@ -27,7 +27,10 @@ class Video:
         for _ in range(self.sequence_length):
             ready, frame = self.cap.read()
             if not ready:
-                raise Exception("VIDEO ENDED")
+                return None
             frames.append(frame)
 
         return Sequence(frames, self.farnback_params)
+
+    def seek(self, frame_id):
+        self.cap.set(cv.CAP_PROP_POS_FRAMES, frame_id)

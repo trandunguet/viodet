@@ -7,12 +7,20 @@ import matplotlib.pyplot as plt
 import core
 
 if __name__ == '__main__':
+    right_arrow = 83
+    space = 32
+    escape = 27
+
     video = core.Video("assets/test.avi")
     plt.ion()
     plt.show()
 
     while True:
         sequence = video.next_sequence()
+        if not sequence:
+            print("Video ended.")
+            break
+
         vif, mean, variance = sequence.get_flows().get_vif()
         print("vif: ", vif)
         print("mean: ", mean)
@@ -22,14 +30,14 @@ if __name__ == '__main__':
         plt.draw()
         plt.pause(0.001)
 
-        key = 32
-        while key != 83:
-            if key == 32:
+        key = space
+        while key != right_arrow:
+            if key == space:
                 for frame in sequence.frames:
                     cv.imshow("video", frame)
                     cv.waitKey(30)
 
-            if key == 27:
+            if key == escape:
                 exit()
 
             key = cv.waitKey()
