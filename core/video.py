@@ -11,15 +11,6 @@ class Video:
         self.sequence_length = 10
         self.height = 240
         self.width = 320
-        self.farnback_params = dict(
-            pyr_scale=0.5,
-            levels=3,
-            winsize=15,
-            iterations=3,
-            poly_n=5,
-            poly_sigma=1.2,
-            flags=0,
-        )
 
     def next_sequence(self):
         frames = []
@@ -30,7 +21,7 @@ class Video:
                 return None
             frames.append(frame)
 
-        return Sequence(frames, self.farnback_params)
+        return Sequence(frames)
 
     def seek(self, frame_id):
         self.cap.set(cv.CAP_PROP_POS_FRAMES, frame_id)

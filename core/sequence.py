@@ -3,11 +3,19 @@ from core.flows import Flows
 
 
 class Sequence:
-    def __init__(self, frames, farnback_params):
+    def __init__(self, frames):
         self.frames = frames
         self.height = frames[0].shape[0]
         self.width = frames[0].shape[1]
-        self.farnback_params = farnback_params
+        self.farnback_params = dict(
+            pyr_scale=0.5,
+            levels=3,
+            winsize=15,
+            iterations=3,
+            poly_n=5,
+            poly_sigma=1.2,
+            flags=0,
+        )
 
     def get_flows(self):
         flows = []
