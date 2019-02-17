@@ -4,8 +4,7 @@ import numpy as np
 class Flows:
     def __init__(self, frames):
         self.frames = frames
-        self.height = frames[0].shape[0]
-        self.width = frames[0].shape[1]
+        self.height, self.width = frames[0].shape[:2]
 
     def get_vif(self):
         binary_sum = np.zeros((self.height, self.width))

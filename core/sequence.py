@@ -3,10 +3,10 @@ from core.flows import Flows
 
 
 class Sequence:
-    def __init__(self, frames):
+    def __init__(self, frames, id_range):
         self.frames = frames
-        self.height = frames[0].shape[0]
-        self.width = frames[0].shape[1]
+        self.id_range = id_range
+        self.height, self.width = frames[0].shape[:2]
         self.farnback_params = dict(
             pyr_scale=0.5,
             levels=3,
