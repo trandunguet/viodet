@@ -11,6 +11,7 @@ if __name__ == '__main__':
     start_time = time.clock()
 
     # Read label file, mark fighting frames ids
+    video_name = "clip1.wmv"
     markup_file = open("assets/clip1_label.txt", "r")
     markup_file.readline()
     fight_frames = []
@@ -32,9 +33,12 @@ if __name__ == '__main__':
         fight_frames.append((int(line[0]), int(line[1])))
 
     # Read video, extract features, label features
-    video = core.Video("assets/clip1.wmv")
+    video = core.Video("assets/{}".format(video_name))
     output_negative = open("features/negative.txt", "a+")
+    output_negative_ref = open("features/negative_ref.txt", "a+")
     output_positive = open("features/positive.txt", "a+")
+    output_positive_ref = open("features/positive_ref.txt", "a+")
+
     negative_count = positive_count = 0
 
     def isViolent(id_range):
@@ -53,19 +57,21 @@ if __name__ == '__main__':
 
         if isViolent(sequence.id_range):
             output_positive.write(np.array2string(vif) + '\n')
+            output_positive_ref.write("{} {} {}\n".format(video_name, sequence.id_range[0], sequence.id_range[1]))
             positive_count += 1
         else:
             output_negative.write(np.array2string(vif) + '\n')
+            output_negative_ref.write("{} {} {}\n".format(video_name, sequence.id_range[0], sequence.id_range[1]))
             negative_count += 1
 
         percentage = int(sequence.id_range[0] * 100 / video.frame_count)
-        sys.stdout.write('\rextracting & labeling features: {} %'.format(percentage))
+        sys.stdout.write('\rExtracting & labeling features: {} %'.format(percentage))
         sys.stdout.flush() 
 
     output_negative.close()
     output_positive.close()
 
-    print("extrated total: {} sequences".format(negative_count + positive_count))
-    print("positive: {}".format(positive_count))
-    print("negative: {}".format(negative_count))
-    print("time elapsed: {} seconds".format(time.clock() - start_time))
+    print("Extrated total: {} sequences".format(negative_count + positive_count))
+    print("Positive: {}".format(positive_count))
+    print("Negative: {}".format(negative_count))
+    print("Time elapsed: {} seconds".format(time.clock() - start_time))
