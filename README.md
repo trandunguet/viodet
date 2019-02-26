@@ -1,4 +1,4 @@
 # Requirement
 ```
-sudo apt install libopencv-dev python3-opencv
+$ pip3 install --user opencv-python scikit-learn
 ```
