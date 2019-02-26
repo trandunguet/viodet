@@ -1,18 +1,28 @@
 #!/usr/bin/env python3
 
-import cv2 as cv
-import numpy as np
 import sys
 import time
+import os
+
+import cv2 as cv
+import numpy as np
 
 import core
 
 if __name__ == '__main__':
-    start_time = time.clock()
+    if len(sys.argv) != 4:
+        print("Invalid argument!")
+        print("Usage: {} VIDEO_PATH MARKUP_FILE_PATH OUTPUT_FOLDER_PATH".format(sys.argv[0]))
+        exit()
 
     # Read label file, mark fighting frames ids
-    video_name = "clip1.wmv"
-    markup_file = open("assets/clip1_label.txt", "r")
+    video_path = sys.argv[1]
+    markup_file_path = sys.argv[2]
+    output_folder_path = sys.argv[3]
+
+    start_time = time.clock()
+
+    markup_file = open(markup_file_path, "r")
     markup_file.readline()
     fight_frames = []
 
@@ -33,11 +43,15 @@ if __name__ == '__main__':
         fight_frames.append((int(line[0]), int(line[1])))
 
     # Read video, extract features, label features
-    video = core.Video("assets/{}".format(video_name))
-    output_negative = open("features/negative.txt", "a+")
-    output_negative_ref = open("features/negative_ref.txt", "a+")
-    output_positive = open("features/positive.txt", "a+")
-    output_positive_ref = open("features/positive_ref.txt", "a+")
+    video = core.Video(video_path)
+
+    if not os.path.exists(output_folder_path):
+        os.makedirs(output_folder_path)
+
+    output_negative = open("{}/negative.txt".format(output_folder_path), "a+")
+    output_negative_ref = open("{}/negative_ref.txt".format(output_folder_path), "a+")
+    output_positive = open("{}/positive.txt".format(output_folder_path), "a+")
+    output_positive_ref = open("{}/positive_ref.txt".format(output_folder_path), "a+")
 
     negative_count = positive_count = 0
 
@@ -57,11 +71,11 @@ if __name__ == '__main__':
 
         if isViolent(sequence.id_range):
             output_positive.write(np.array2string(vif) + '\n')
-            output_positive_ref.write("{} {} {}\n".format(video_name, sequence.id_range[0], sequence.id_range[1]))
+            output_positive_ref.write("{} {} {}\n".format(video_path, sequence.id_range[0], sequence.id_range[1]))
             positive_count += 1
         else:
             output_negative.write(np.array2string(vif) + '\n')
-            output_negative_ref.write("{} {} {}\n".format(video_name, sequence.id_range[0], sequence.id_range[1]))
+            output_negative_ref.write("{} {} {}\n".format(video_path, sequence.id_range[0], sequence.id_range[1]))
             negative_count += 1
 
         percentage = int(sequence.id_range[0] * 100 / video.frame_count)
