@@ -32,11 +32,14 @@ if __name__ == '__main__':
 
         if line[2] != 'positive':
             continue
-        
-        fight_frames.append((int(line[0]), int(line[1])))
+
+        fight_frames_id.append((int(line[0]), int(line[1])))
 
     # Read video, extract features, label features
     video = core.Video(video_path)
+
+    # Use this line if you want to test the last few frames
+    # video.seek(video.frame_count - 20)
 
     if not os.path.exists(output_folder_path):
         os.makedirs(output_folder_path)
@@ -48,30 +51,32 @@ if __name__ == '__main__':
 
     negative_count = positive_count = 0
 
-    def isViolent(id_range):
-        for begin, end in fight_frames:
-            if begin <= id_range[0] < id_range[1] <= end:
+    def isViolent(id_begin, id_end):
+        for fight_begin, fight_end in fight_frames_id:
+            if fight_begin <= id_begin < id_end <= fight_end:
                 return True
         return False
 
     while True:
-        sequence = video.next_sequence()
-        if not sequence:
-            print("\nVideo ended.")
+        frame_id_begin = video.get_current_frame_id()
+        frame_id_end = frame_id_begin + video.sequence_length - 1
+
+        try:
+            vif = video.next_sequence_features()
+        except Exception as e:
+            print("\n{}".format(e))
             break
 
-        vif, _, _ = sequence.get_flows().get_vif()
-
-        if isViolent(sequence.id_range):
+        if isViolent(frame_id_begin, frame_id_end):
             output_positive.write(np.array2string(vif) + '\n')
-            output_positive_ref.write("{} {} {}\n".format(video_path, sequence.id_range[0], sequence.id_range[1]))
+            output_positive_ref.write("{} {} {}\n".format(video_path, frame_id_begin, frame_id_end))
             positive_count += 1
         else:
             output_negative.write(np.array2string(vif) + '\n')
-            output_negative_ref.write("{} {} {}\n".format(video_path, sequence.id_range[0], sequence.id_range[1]))
+            output_negative_ref.write("{} {} {}\n".format(video_path, frame_id_begin, frame_id_end))
             negative_count += 1
 
-        percentage = int(sequence.id_range[0] * 100 / video.frame_count)
+        percentage = int(frame_id_begin * 100 / video.frame_count)
         sys.stdout.write('\rExtracting & labeling features: {} %'.format(percentage))
         sys.stdout.flush() 
 
