@@ -10,5 +10,5 @@ $ bash script/get_BEHAVE_dataset.sh
 
 # Extract & label feature
 ```
-$ python3 features_labeling.py VIDEO_PATH MARKUP_FILE_PATH OUTPUT_DIR
+$ python3 label.py VIDEO_PATH MARKUP_FILE_PATH OUTPUT_DIR
 ```
