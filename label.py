@@ -23,21 +23,14 @@ if __name__ == '__main__':
     start_time = time.clock()
 
     markup_file = open(markup_file_path, "r")
-    markup_file.readline()
     fight_frames_id = []
 
     while True:
-        line = markup_file.readline().replace('\t', ' ').replace(';', ' ').replace('\n', ' ').split()
+        line = markup_file.readline().split()
         if len(line) < 3:
             break
 
-        if line[0][0] == '[':
-            line.pop(0)
-
-        if line[0][0] == '[':
-            line.pop(0)
-
-        if line[2] != 'Fight':
+        if line[2] != 'positive':
             continue
 
         fight_frames_id.append((int(line[0]), int(line[1])))
