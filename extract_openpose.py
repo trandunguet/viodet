@@ -8,6 +8,7 @@ out = cv.VideoWriter('dataset/BEHAVE/output.avi',fourcc, 20.0, (640,480))
 
 cap = cv.VideoCapture("dataset/BEHAVE/fight_margaret_1_24_01_2007.wmv")
 cap.set(cv.CAP_PROP_POS_FRAMES, 60683)
+fgbg = cv.createBackgroundSubtractorMOG2()
 
 params = dict()
 params["model_folder"] = "models/openpose/"
@@ -24,8 +25,11 @@ while True:
     print('{} fps'.format(1 / (time.clock() - t)))
     t = time.clock()
 
-    _, imageToProcess = cap.read()
-    datum.cvInputData = imageToProcess
+    _, frame = cap.read()
+    fgmask = fgbg.apply(frame)
+    frame = cv.bitwise_and(frame, frame, mask = fgmask)
+
+    datum.cvInputData = frame
     opWrapper.emplaceAndPop([datum])
 
     # Display Image
