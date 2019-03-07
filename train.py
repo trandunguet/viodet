@@ -1,39 +1,32 @@
-import matplotlib.pyplot as plt
+#!/usr/bin/env python3
+
 from sklearn import datasets, svm, metrics
+import numpy as np
 
-digits = datasets.load_digits()
+import core
 
-images_and_labels = list(zip(digits.images, digits.target))
-for index, (image, label) in enumerate(images_and_labels[:4]):
-    plt.subplot(2, 4, index + 1)
-    plt.axis('off')
-    plt.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
-    plt.title('Training: %i' % label)
+data, target = core.load_features("features")
+n_samples = len(data)
+alpha = 1 / 2
 
-# To apply a classifier on this data, we need to flatten the image, to
-# turn the data in a (samples, feature) matrix:
-n_samples = len(digits.images)
-data = digits.images.reshape((n_samples, -1))
+print("loaded {} samples".format(n_samples))
+
+print("data shape: {} \ntarget shape: {}".format(data.shape, target.shape))
 
 # Create a classifier: a support vector classifier
-classifier = svm.SVC(gamma=0.001)
+classifier = svm.SVC(gamma='auto')
+
+print("training")
 
 # We learn the digits on the first half of the digits
-classifier.fit(data[:n_samples // 2], digits.target[:n_samples // 2])
+classifier.fit(data[:int(n_samples * alpha)], target[:int(n_samples * alpha)])
+
+print("predicting")
 
 # Now predict the value of the digit on the second half:
-expected = digits.target[n_samples // 2:]
-predicted = classifier.predict(data[n_samples // 2:])
+expected = target[int(n_samples * (1 - alpha)):]
+predicted = classifier.predict(data[int(n_samples * (1 - alpha)):])
 
 print("Classification report for classifier %s:\n%s\n"
       % (classifier, metrics.classification_report(expected, predicted)))
 print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
-
-images_and_predictions = list(zip(digits.images[n_samples // 2:], predicted))
-for index, (image, prediction) in enumerate(images_and_predictions[:4]):
-    plt.subplot(2, 4, index + 5)
-    plt.axis('off')
-    plt.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
-    plt.title('Prediction: %i' % prediction)
-
-plt.show()
