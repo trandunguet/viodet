@@ -2,5 +2,5 @@
 .vscode
 features
 .env
-dataset
+data
 models
