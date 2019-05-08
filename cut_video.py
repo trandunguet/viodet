@@ -1,33 +1,69 @@
 import sys
-import cv2
+import time
+import os
+
+import cv2 as cv
+import numpy as np
+
+import core
 
 if __name__ == '__main__':
-    if len(sys.argv) != 5:
+    if len(sys.argv) != 4:
         print("Invalid argument!")
-        print("Usage: {} VIDEO START_POS LENGTH OUTPUT".format(sys.argv[0]))
+        print("Usage: {} VIDEO_PATH MARKUP_FILE_PATH OUTPUT_FOLDER_PATH".format(sys.argv[0]))
         exit()
-    
-    cap = cv2.VideoCapture(sys.argv[1])
-    start = float(sys.argv[2])
-    length = int(sys.argv[3])
-    output_path = sys.argv[4]
 
-    # Define the codec and create VideoWriter object
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(output_path, fourcc, 20.0, (640,480))
+    # Read label file, mark fighting frames ids
+    cap = cv.VideoCapture(sys.argv[1])
+    markup_file_path = sys.argv[2]
+    output_folder_path = sys.argv[3]
+    sequence_length = 30
 
-    cap.set(cv2.CAP_PROP_POS_MSEC, start)
-    for i in range(length):
-        ret, frame = cap.read()
-        if ret:
-            out.write(frame)
+    start_time = time.clock()
 
-            cv2.imshow('frame', frame)
-            cv2.waitKey(30)
-        else:
-            break
+    markup_file = open(markup_file_path, "r")
+    markup = []
 
-    # Release everything if job is finished
-    cap.release()
-    out.release()
-    cv2.destroyAllWindows()
+    for line in markup_file:
+        words = line.split()
+        markup.append((int(words[0]), int(words[1]), words[2]))
+
+    output_path_negative = '{}/negative'.format(output_folder_path)
+    output_path_positive = '{}/positive'.format(output_folder_path)
+
+    if not os.path.exists(output_folder_path):
+        os.makedirs(output_folder_path)
+
+    if not os.path.exists(output_path_negative):
+        os.makedirs(output_path_negative)
+
+    if not os.path.exists(output_path_positive):
+        os.makedirs(output_path_positive)
+
+    negative_list_file = open('{}/list.txt'.format(output_path_negative), 'w')
+    positive_list_file = open('{}/list.txt'.format(output_path_positive), 'w')
+
+    negative_count = positive_count = 0
+    fourcc = cv.VideoWriter_fourcc(*'XVID')
+
+    positive_id = 0
+    negative_id = 0
+    for line in markup:
+        for start in range(line[0], line[1] - sequence_length, sequence_length):
+            if line[2] == 'negative':
+                negative_list_file.write('{}.avi\n'.format(negative_id))
+                output_path = '{}/{}/{}.avi'.format(output_folder_path, line[2], negative_id)
+                negative_id += 1
+            else:
+                positive_list_file.write('{}.avi\n'.format(positive_id))
+                output_path = '{}/{}/{}.avi'.format(output_folder_path, line[2], positive_id)
+                positive_id += 1
+
+            out = cv.VideoWriter(output_path, fourcc, 20.0, (640, 480))
+            cap.set(cv.CAP_PROP_POS_FRAMES, start)
+
+            for i in range(sequence_length):
+                _, frame = cap.read()
+                out.write(frame)
+
+            out.release()
