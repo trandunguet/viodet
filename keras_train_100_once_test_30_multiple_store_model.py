@@ -18,7 +18,7 @@ data = range(1,70)
 random.shuffle(data)
 X_train = np.empty((0,336))
 Y_train = np.array([])
-for i in data:
+for i in range(400, 700):
     try:
         file_name = '{}/negative/{}.txt'.format(input_folder, i)
         file_obj = open(file_name, 'r')
@@ -36,7 +36,7 @@ for i in data:
         print 'error in reading nonvio_%d.txt' % i
 
 # reading violent video features
-for i in data:
+for i in range(0, 62):
     try:
         file_name = '{}/positive/{}.txt'.format(input_folder, i)
         file_obj = open(file_name, 'r')

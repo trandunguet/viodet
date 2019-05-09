@@ -5,7 +5,7 @@ import os
 import cv2 as cv
 import numpy as np
 
-import core
+from core import PreProcess
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
@@ -17,7 +17,8 @@ if __name__ == '__main__':
     cap = cv.VideoCapture(sys.argv[1])
     markup_file_path = sys.argv[2]
     output_folder_path = sys.argv[3]
-    sequence_length = 30
+    tmp = PreProcess()
+    sequence_length = tmp.SEQUENCE_LENGTH * tmp.FRAME_GAP
 
     start_time = time.clock()
 
@@ -62,7 +63,8 @@ if __name__ == '__main__':
             out = cv.VideoWriter(output_path, fourcc, 20.0, (640, 480))
             cap.set(cv.CAP_PROP_POS_FRAMES, start)
 
-            for i in range(sequence_length):
+            # BUG: last frame of the last video may be empty. need to fix ASAP
+            for i in range(sequence_length + 1):
                 _, frame = cap.read()
                 out.write(frame)
 

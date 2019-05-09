@@ -1,43 +1,25 @@
 import cv2
 import numpy as np
-from .VideoProcess import PreProcess
 from .OpticalFlow import OptFlow
 import math
 
 
 class VioFlow:
-    def __init__(self, video_name):
+    def __init__(self):
         self.height = 0
         self.width = 0
         self.B_height = 0
         self.B_width = 0
         self.bins = np.arange(0.0, 1.05, 0.05, dtype=np.float64)
-        self.video_name = video_name
 
-    def getViolentFlow(self):
-        vid = PreProcess()
-        vid.read_video(self.video_name)
+    def getViolentFlow(self, sequence):
         flow = OptFlow()
-        vid.setVideoDimension(100)
-        index = 0
         temp_flows = []
-        for each_frame_index in range(3, vid.total_frames - vid.FRAME_GAP - 5, vid.FRAME_GAP):
-
-            PREV_F = vid.getFrameFromIndex(each_frame_index)
-            CURRENT_F = vid.getFrameFromIndex(
-                each_frame_index + vid.MOVEMENT_INTERVAL)
-            NEXT_F = vid.getFrameFromIndex(
-                each_frame_index + (2 * vid.MOVEMENT_INTERVAL))
-
-            PREV_F = vid.resize_frame(PREV_F)
-            CURRENT_F = vid.resize_frame(CURRENT_F)
-            NEXT_F = vid.resize_frame(NEXT_F)
-
-            (vx1, vy1, w1) = flow.sorFlow(PREV_F, CURRENT_F)
-            (vx2, vy2, w2) = flow.sorFlow(CURRENT_F, NEXT_F)
+        for (frame_0, frame_1, frame_2) in sequence:
+            (vx1, vy1, w1) = flow.sorFlow(frame_0, frame_1)
+            (vx2, vy2, w2) = flow.sorFlow(frame_1, frame_2)
 
             m1 = flow.getFlowMagnitude(vx1, vy1)
-            index = index + 1
             m2 = flow.getFlowMagnitude(vx2, vy2)
 
             change_mag = abs(m2-m1)
@@ -49,7 +31,7 @@ class VioFlow:
         for each_flow in temp_flows:
             flow_video = flow_video + each_flow
 
-        flow_video = flow_video / index
+        flow_video = flow_video / len(temp_flows)
 
         self.height = flow_video.shape[0]
         self.width = flow_video.shape[1]
@@ -71,9 +53,9 @@ class VioFlow:
         count_of_bins = self.histc(flow_vec, self.bins)
         return count_of_bins/np.sum(count_of_bins)
 
-    def getFeatureVector(self):
+    def getFeatureVector(self, sequence):
         frame_hist = []
-        flow_video = self.getViolentFlow()
+        flow_video = self.getViolentFlow(sequence)
         for y in range(6, self.height-self.B_height-4, self.B_height):
             for x in range(6, self.width-self.B_width-4, self.B_width):
                 block_hist = self.getBlockHist(
@@ -81,5 +63,5 @@ class VioFlow:
                 frame_hist = np.append(frame_hist, block_hist, axis=0)
         return frame_hist
 
-    def writeFeatureToFile(self, filename):
-        np.savetxt(filename, self.getFeatureVector(), delimiter=',')
+    def writeFeatureToFile(self, sequence, filename):
+        np.savetxt(filename, self.getFeatureVector(sequence), delimiter=',')
