@@ -56,8 +56,9 @@ if __name__ == '__main__':
 
         ready, frame = cap.read()
         if not ready:
+            frame_id = cap.get(cv.CAP_PROP_FRAME_COUNT)
             if current_segment:
-                current_segment.end(frame_id - 1, output)
+                current_segment.end(frame_id, output)
             break
         
         cv.imshow(video_path, frame)
@@ -73,7 +74,7 @@ if __name__ == '__main__':
             continue
 
         if current_segment:
-            current_segment.end(frame_id - 1, output)
+            current_segment.end(frame_id, output)
         
         current_segment = segment(frame_id, label)
         if key == escape_key:
