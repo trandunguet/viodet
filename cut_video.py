@@ -27,6 +27,8 @@ if __name__ == '__main__':
 
     for line in markup_file:
         words = line.split()
+        if words[0][0] == '#':
+            continue
         markup.append((int(words[0]), int(words[1]), words[2]))
 
     output_path_negative = '{}/negative'.format(output_folder_path)
