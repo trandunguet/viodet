@@ -40,7 +40,6 @@ class PreProcess:
         return next_sequence
 
     def get_frame_from_index(self, index):
-        print index
         self.cap.set(cv.CAP_PROP_POS_FRAMES, index)
         ret, img = self.cap.read()
         img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
