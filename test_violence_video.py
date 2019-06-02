@@ -12,15 +12,16 @@ from keras.models import model_from_json
 from core import PreProcess, VioFlow
 
 if len(sys.argv) < 2:
-    print 'usage: {} VIDEO PATH'.format(sys.argv[0])
+    print 'usage: {} VIDEO_PATH MODEL_PATH'.format(sys.argv[0])
     exit()
 video_name = sys.argv[1]
+model_path = sys.argv[2]
 
-json_file = open('model_100.json', 'r')
+json_file = open('{}/model_100.json'.format(model_path), 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 model = model_from_json(loaded_model_json)
-model.load_weights("model_100.h5")
+model.load_weights("{}/model_100.h5".format(model_path))
 
 video = PreProcess()
 video.read_video(video_name)

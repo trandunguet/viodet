@@ -7,12 +7,13 @@ from keras.layers import Dense
 from sklearn.metrics import confusion_matrix
 import numpy as np
 
-if len(sys.argv) != 2:
+if len(sys.argv) != 3:
     print("Invalid argument!")
-    print("Usage: {} INPUT_FOLDER".format(sys.argv[0]))
+    print("Usage: {} INPUT_FOLDER OUTPUT_FOLDER".format(sys.argv[0]))
     exit()
 
 input_folder = sys.argv[1]
+output_folder = sys.argv[2]
 X_train = np.empty((0,336))
 Y_train = np.array([])
 
@@ -121,9 +122,9 @@ print 'accuracy is : ' + str(accuracy)
 # save model to disk
 model_json = model.to_json()
 
-with open("model_100.json", "w") as json_file:
+with open("{}/model_100.json".format(output_folder), "w") as json_file:
     json_file.write(model_json)
 
-model.save_weights("model_100.h5")
+model.save_weights("{}/model_100.h5".format(output_folder))
 print("Saved model to disk")
 
