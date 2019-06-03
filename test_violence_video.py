@@ -36,7 +36,7 @@ while (True):
     print pred
 
     display = video.get_original_frame_from_index(video.current_frame_id)
-    if pred > 0.9:
+    if pred > 0.5:
         circle_color = (0, 0, 255)
     else:
         circle_color = (255, 0, 0)
