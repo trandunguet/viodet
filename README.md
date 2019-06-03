@@ -1,14 +1,26 @@
 # Requirement
-```
-$ pip3 install --user opencv-python scikit-learn
-```
+Anaconda:
+
+- python 2.7
+- bob.ip.optflow.liu
+- keras
+
+Pip:
+
+- opencv-python
+- scikit-learn
 
 # Get BEHAVE dataset
-```
-$ bash script/get_BEHAVE_dataset.sh
-```
+`$ bash script/get_BEHAVE_dataset.sh`
 
-# Extract & label feature
-```
-$ python3 label.py VIDEO_PATH MARKUP_FILE_PATH OUTPUT_DIR
-```
+# Cut video into segments
+`$ python cut_video.py VIDEO_PATH MARKUP_FILE_PATH OUTPUT_DIR`
+
+# Extract video segments to vif
+`$ python extract_feature.py INPUT_FOLDER OUTPUT_FOLDER`
+
+# Train
+`$ python train.py INPUT_1 ... INPUT_N OUTPUT`
+
+# Test
+`$ python test.py INPUT OUTPUT`
