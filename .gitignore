@@ -1,6 +1,4 @@
 *.pyc
 .vscode
-features
 .env
-data
-models
+/BEHAVE
