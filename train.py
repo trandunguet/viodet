@@ -1,4 +1,5 @@
 import sys
+import os
 
 from keras.models import Sequential
 from keras.layers import Dense
@@ -57,6 +58,8 @@ if len(sys.argv) < 3:
     exit()
 
 output_folder = sys.argv[-1]
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
 
 X_train = np.empty((0, 336))
 Y_train = np.array([])
