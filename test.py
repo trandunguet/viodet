@@ -1,6 +1,6 @@
 import numpy as np
 from keras.models import model_from_json
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, f1_score, accuracy_score
 
 import sys
 
@@ -53,25 +53,31 @@ json_file.close()
 model = model_from_json(loaded_model_json)
 model.load_weights("{}/model_100.h5".format(model_folder))
 
-X_test = np.empty((0, 336))
-Y_test = np.array([])
+x_test = np.empty((0, 336))
+y_test = np.array([])
 
 print('loading ' + test_folder)
-X_test, Y_test = load_from_folder(X_test, Y_test, test_folder)
+x_test, y_test = load_from_folder(x_test, y_test, test_folder)
 
 print('testing')
-predictions = model.predict(X_test)
+predictions = model.predict(x_test)
 
-pred = [round(x[0]) for x in predictions]
+best_f1 = 0
+step = 0.001
+for i in range (1, int(1 / step)):
+    threshold = step * i
+    y_pred = np.zeros_like(predictions)
+    y_pred[predictions > threshold] = 1
 
-acc_count = 0
-for k in range(0,len(pred)):
-    if pred[k] == Y_test[k]:
-        acc_count += 1
+    f1 = f1_score(y_test, y_pred)
 
-cm = confusion_matrix(Y_test, pred)
+    if f1 > best_f1:
+        best_threshold = threshold
+        best_f1 = f1
+        best_y_pred = y_pred
+
+print('threshold: {}'.format(best_threshold))
+print('f1 score: {}'.format(best_f1))
+print('accuracy: {}'.format(accuracy_score(y_test, best_y_pred)))
 print('confusion matrix:')
-print cm
-
-accuracy = float(acc_count)/len(pred)
-print 'accuracy is : ' + str(accuracy)
+print(confusion_matrix(y_test, best_y_pred))
